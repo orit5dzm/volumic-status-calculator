@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор волемического статуса</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: clamp(20px, 4vw, 28px);
+            margin-bottom: 5px;
+        }
+        
+        .header .author {
+            font-size: 14px;
+            opacity: 0.8;
+            color: #bdc3c7;
+        }
+        
+        .content {
+            padding: 15px 20px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            min-width: 120px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .input-group input[type="text"], 
+        .input-group input[type="number"] {
+            padding: 8px 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 80px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .mk-input {
+            width: 150px !important;
+            font-family: monospace;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+        
+        .checkbox-group label {
+            font-size: 14px;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+        
+        .measurement-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto auto;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .measurement-label {
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .range-info {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-left: 5px;
+        }
+        
+        .variability-result {
+            font-weight: bold;
+            color: #2ecc71;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .results {
+            background: #e8f5e8;
+            border: 2px solid #2ecc71;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .results h3 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        
+        .conclusion {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .history-item {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .history-data {
+            font-size: 14px;
+            color: #555;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .alert-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 10px 15px;
+            }
+            
+            .measurement-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                text-align: left;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .input-group label {
+                min-width: auto;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 10px;
+            }
+            
+            .mk-input {
+                width: 120px !important;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Калькулятор волемического статуса</h1>
+            <div class="author">by Matiash M.I. ICU5</div>
+        </div>
+        
+        <div class="content">
+            <!-- Поиск пациента -->
+            <div class="section">
+                <h3>Поиск пациента</h3>
+                <div class="input-group">
+                    <label for="mkNumber">Номер МК (****-**):</label>
+                    <input type="text" id="mkNumber" class="mk-input" placeholder="0000-00" maxlength="7">
+                    <button class="btn" onclick="searchPatient()">Найти/Новое исследование</button>
+                </div>
+            </div>
+            
+            <!-- Предыдущие исследования -->
+            <div id="historySection" class="section hidden">
+                <h3>Предыдущие исследования</h3>
+                <div id="historyList"></div>
+            </div>
+            
+            <!-- Параметры пациента -->
+            <div class="section">
+                <h3>Параметры пациента</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="age65">
+                    <label for="age65">Пациент старше 65 лет</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="onVentilator">
+                    <label for="onVentilator">Пациент на ИВЛ</label>
+                </div>
+            </div>
+            
+            <!-- Измерения -->
+            <div class="section">
+                <h3>Измерения вариабельности</h3>
+                
+                <div class="measurement-row">
+                    <div class="measurement-label">
+                        Вариабельность яремной вены
+                        <div class="range-info">non-responder &lt;18%</div>
+                    </div>
+                    <input type="number" id="ijvMax" placeholder="Макс" step="0.1">
+                    <input type="number" id="ijvMin" placeholder="Мин" step="0.1">
+                    <div class="variability-result" id="ijvResult">-</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="ijvNonInfo" onchange="toggleNonInfo('ijv')">
+                        <label for="ijvNonInfo">Не информативно</label>
+                    </div>
+                </div>
+                
+                <div class="measurement-row">
+                    <div class="measurement-label">
+                        VTI сонной артерии
+                        <div class="range-info">non-responder &lt;12%</div>
+                    </div>
+                    <input type="number" id="carotidMax" placeholder="Макс" step="0.1">
+                    <input type="number" id="carotidMin" placeholder="Мин" step="0.1">
+                    <div class="variability-result" id="carotidResult">-</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="carotidNonInfo" onchange="toggleNonInfo('carotid')">
+                        <label for="carotidNonInfo">Не информативно</label>
+                    </div>
+                </div>
+                
+                <div class="measurement-row">
+                    <div class="measurement-label">
+                        VTI плечевой артерии
+                        <div class="range-info">non-responder &lt;12%</div>
+                    </div>
+                    <input type="number" id="brachialMax" placeholder="Макс" step="0.1">
+                    <input type="number" id="brachialMin" placeholder="Мин" step="0.1">
+                    <div class="variability-result" id="brachialResult">-</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="brachialNonInfo" onchange="toggleNonInfo('brachial')">
+                        <label for="brachialNonInfo">Не информативно</label>
+                    </div>
+                </div>
+                
+                <div class="measurement-row">
+                    <div class="measurement-label">
+                        Вариабельность НПВ
+                        <div class="range-info">ИВЛ: non-responder &lt;18%, без ИВЛ: 35-50%</div>
+                    </div>
+                    <input type="number" id="ivcMax" placeholder="Макс" step="0.1">
+                    <input type="number" id="ivcMin" placeholder="Мин" step="0.1">
+                    <div class="variability-result" id="ivcResult">-</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="ivcNonInfo" onchange="toggleNonInfo('ivc')">
+                        <label for="ivcNonInfo">Не информативно</label>
+                    </div>
+                </div>
+                
+                <div class="measurement-row">
+                    <div class="measurement-label">
+                        Корригированный QT (Bazett)
+                        <div class="range-info">&gt;65 лет: responder &lt;350мс, &lt;65 лет: responder &lt;325мс</div>
+                    </div>
+                    <input type="number" id="heartRate" placeholder="ЧСС">
+                    <input type="number" id="qtInterval" placeholder="QT мс">
+                    <div class="variability-result" id="qtResult">-</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="qtNonInfo" onchange="toggleNonInfo('qt')">
+                        <label for="qtNonInfo">Не информативно</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="section">
+                <button class="btn" onclick="calculate()">Рассчитать</button>
+            </div>
+            
+            <!-- Результаты -->
+            <div id="resultsSection" class="results hidden">
+                <h3>Заключение</h3>
+                <div id="conclusionText" class="conclusion"></div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="copyConclusion()">Копировать заключение</button>
+                    <button id="saveBtn" class="btn btn-secondary" onclick="saveStudy()">Сохранить исследование</button>
+                </div>
+                <div id="saveMessage" class="alert alert-warning hidden">
+                    Для сохранения результата введите номер МК
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Хранилище данных (в реальном приложении будет Google Sheets)
+        let studyData = JSON.parse(localStorage.getItem('studyData') || '{}');
+        
+        // Форматирование номера МК
+        document.getElementById('mkNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            if (value.length > 4) {
+                value = value.substring(0, 6) + '-' + value.substring(6, 8);
+            }
+            e.target.value = value;
+        });
+        
+        // Автоматический расчет вариабельности
+        function setupAutoCalculation() {
+            const measurements = ['ijv', 'carotid', 'brachial', 'ivc'];
+            measurements.forEach(type => {
+                document.getElementById(type + 'Max').addEventListener('input', () => calculateVariability(type));
+                document.getElementById(type + 'Min').addEventListener('input', () => calculateVariability(type));
+            });
+            
+            document.getElementById('heartRate').addEventListener('input', calculateQTc);
+            document.getElementById('qtInterval').addEventListener('input', calculateQTc);
+        }
+        
+        function calculateVariability(type) {
+            const maxInput = document.getElementById(type + 'Max');
+            const minInput = document.getElementById(type + 'Min');
+            const resultDiv = document.getElementById(type + 'Result');
+            
+            if (document.getElementById(type + 'NonInfo').checked) {
+                resultDiv.textContent = 'Н/И';
+                return;
+            }
+            
+            const max = parseFloat(maxInput.value);
+            const min = parseFloat(minInput.value);
+            
+            if (isNaN(max) || isNaN(min) || max <= 0 || min <= 0) {
+                resultDiv.textContent = '-';
+                return;
+            }
+            
+            const variability = ((max - min) / ((max + min) / 2)) * 100;
+            resultDiv.textContent = variability.toFixed(1) + '%';
+        }
+        
+        function calculateQTc() {
+            const heartRate = parseFloat(document.getElementById('heartRate').value);
+            const qtInterval = parseFloat(document.getElementById('qtInterval').value);
+            const resultDiv = document.getElementById('qtResult');
+            
+            if (document.getElementById('qtNonInfo').checked) {
+                resultDiv.textContent = 'Н/И';
+                return;
+            }
+            
+            if (isNaN(heartRate) || isNaN(qtInterval) || heartRate <= 0 || qtInterval <= 0) {
+                resultDiv.textContent = '-';
+                return;
+            }
+            
+            const rr = 60 / heartRate;
+            const qtc = qtInterval / Math.sqrt(rr);
+            resultDiv.textContent = qtc.toFixed(0) + ' мс';
+        }
+        
+        function toggleNonInfo(type) {
+            const checkbox = document.getElementById(type + 'NonInfo');
+            const inputs = type === 'qt' ? 
+                [document.getElementById('heartRate'), document.getElementById('qtInterval')] :
+                [document.getElementById(type + 'Max'), document.getElementById(type + 'Min')];
+            
+            inputs.forEach(input => {
+                input.disabled = checkbox.checked;
+                if (checkbox.checked) {
+                    input.value = '';
+                }
+            });
+            
+            if (type === 'qt') {
+                calculateQTc();
+            } else {
+                calculateVariability(type);
+            }
+        }
+        
+        function searchPatient() {
+            const mkNumber = document.getElementById('mkNumber').value.trim();
+            
+            if (!mkNumber) {
+                alert('Введите номер МК');
+                return;
+            }
+            
+            const history = studyData[mkNumber] || [];
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="alert alert-info">Нет данных о проведённых исследованиях</div>';
+            } else {
+                historyList.innerHTML = history.map((study, index) => `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <div>
+                                <strong>${new Date(study.date).toLocaleString('ru-RU')}</strong>
+                                <span style="margin-left: 15px; padding: 4px 8px; border-radius: 4px; font-size: 12px; ${study.isResponder ? 'background: #d4edda; color: #155724;' : 'background: #f8d7da; color: #721c24;'}">
+                                    ${study.isResponder ? 'Fluid responder' : 'Non-fluid responder'}
+                                </span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-success" style="padding: 5px 10px; font-size: 12px;" onclick="copyFullConclusion(${index}, '${mkNumber}')">Копировать</button>
+                                <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteStudy(${index}, '${mkNumber}')">Удалить</button>
+                            </div>
+                        </div>
+                        <div class="history-data">
+                            ${study.measurements.filter(m => m.value !== 'Н/И' && m.value !== '-').map(m => 
+                                `<div><strong>${m.name}:</strong> ${m.value}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            historySection.classList.remove('hidden');
+        }
+        
+        function calculate() {
+            const measurements = [];
+            let responderCount = 0;
+            let totalValidMeasurements = 0;
+            
+            // Анализ каждого измерения
+            const measurementTypes = [
+                {id: 'ijv', name: 'ВЯВ', threshold: 18, type: 'percent'},
+                {id: 'carotid', name: 'VTI сонной', threshold: 12, type: 'percent'},
+                {id: 'brachial', name: 'VTI плечевой', threshold: 12, type: 'percent'},
+                {id: 'ivc', name: 'НПВ', threshold: document.getElementById('onVentilator').checked ? 18 : 35, type: 'percent'},
+                {id: 'qt', name: 'QTc (Bazett)', threshold: document.getElementById('age65').checked ? 350 : 325, type: 'qt'}
+            ];
+            
+            measurementTypes.forEach(measurement => {
+                const resultElement = document.getElementById(measurement.id + 'Result');
+                const value = resultElement.textContent;
+                
+                if (value === 'Н/И') {
+                    measurements.push({
+                        name: measurement.name,
+                        value: 'Н/И',
+                        isResponder: null
+                    });
+                } else if (value === '-') {
+                    // Пропускаем незаполненные измерения
+                    return;
+                } else {
+                    const numericValue = parseFloat(value);
+                    let isResponder;
+                    
+                    if (measurement.type === 'qt') {
+                        isResponder = numericValue < measurement.threshold;
+                    } else {
+                        if (measurement.id === 'ivc' && !document.getElementById('onVentilator').checked) {
+                            // Для НПВ без ИВЛ: норма 35-50%
+                            isResponder = numericValue >= 35 && numericValue <= 50;
+                        } else {
+                            isResponder = numericValue >= measurement.threshold;
+                        }
+                    }
+                    
+                    measurements.push({
+                        name: measurement.name,
+                        value: value,
+                        isResponder: isResponder,
+                        threshold: measurement.threshold,
+                        type: measurement.type
+                    });
+                    
+                    totalValidMeasurements++;
+                    if (isResponder) responderCount++;
+                }
+            });
+            
+            if (totalValidMeasurements === 0) {
+                alert('Введите хотя бы одно измерение для расчета');
+                return;
+            }
+            
+            // Генерация заключения
+            const isOverallResponder = responderCount > totalValidMeasurements / 2;
+            const conclusion = generateConclusion(measurements, responderCount, totalValidMeasurements, isOverallResponder);
+            
+            // Отображение результатов
+            document.getElementById('conclusionText').innerHTML = conclusion;
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // Проверка возможности сохранения
+            const mkNumber = document.getElementById('mkNumber').value.trim();
+            const saveBtn = document.getElementById('saveBtn');
+            const saveMessage = document.getElementById('saveMessage');
+            
+            if (!mkNumber) {
+                saveBtn.disabled = true;
+                saveMessage.classList.remove('hidden');
+            } else {
+                saveBtn.disabled = false;
+                saveMessage.classList.add('hidden');
+            }
+            
+            // Сохранение текущих результатов для копирования
+            window.currentConclusion = conclusion;
+            window.currentStudyData = {
+                measurements: measurements,
+                isResponder: isOverallResponder,
+                responderCount: responderCount,
+                totalMeasurements: totalValidMeasurements,
+                age65: document.getElementById('age65').checked,
+                onVentilator: document.getElementById('onVentilator').checked
+            };
+        }
+        
+        function generateConclusion(measurements, responderCount, totalMeasurements, isOverallResponder) {
+            let conclusion = 'По данным ультразвуковой оценки волемического статуса (';
+            
+            const validMeasurements = measurements.filter(m => m.value !== 'Н/И' && m.isResponder !== null);
+            const measurementTexts = validMeasurements.map(m => {
+                if (m.type === 'qt') {
+                    return `${m.name} ${m.value} ${m.isResponder ? `(responder <${m.threshold}мс)` : `(non-responder ≥${m.threshold}мс)`}`;
+                } else {
+                    if (m.name === 'НПВ' && !document.getElementById('onVentilator').checked) {
+                        return `${m.name} ${m.value} ${m.isResponder ? '(норма 35-50%)' : '(вне нормы 35-50%)'}`;
+                    } else {
+                        return `${m.name} ${m.value} ${m.isResponder ? `(responder ≥${m.threshold}%)` : `(non-responder <${m.threshold}%)`}`;
+                    }
+                }
+            });
+            
+            conclusion += measurementTexts.join(', ') + ') ';
+            conclusion += `${responderCount} из ${totalMeasurements} параметров указывают на `;
+            
+            if (responderCount === totalMeasurements || responderCount === 0) {
+                conclusion += isOverallResponder ? 
+                    'Fluid responder статус. Пациент с высокой вероятностью ответит на инфузионную терапию.' :
+                    'Non-fluid responder статус. Пациент с низкой вероятностью ответит на инфузионную терапию.';
+            } else {
+                conclusion += 'спорный результат. Требуется дополнительная клиническая оценка для определения волемического статуса.';
+            }
+            
+            return conclusion;
+        }
+        
+        function copyConclusion() {
+            if (window.currentConclusion) {
+                navigator.clipboard.writeText(window.currentConclusion).then(() => {
+                    alert('Заключение скопировано в буфер обмена');
+                });
+            }
+        }
+        
+        function copyFullConclusion(index, mkNumber) {
+            const study = studyData[mkNumber][index];
+            const conclusion = study.fullConclusion;
+            navigator.clipboard.writeText(conclusion).then(() => {
+                alert('Заключение скопировано в буфер обмена');
+            });
+        }
+        
+        function saveStudy() {
+            const mkNumber = document.getElementById('mkNumber').value.trim();
+            if (!mkNumber || !window.currentStudyData) {
+                alert('Невозможно сохранить исследование');
+                return;
+            }
+            
+            if (!studyData[mkNumber]) {
+                studyData[mkNumber] = [];
+            }
+            
+            const studyRecord = {
+                date: new Date().toISOString(),
+                measurements: window.currentStudyData.measurements,
+                isResponder: window.currentStudyData.isResponder,
+                responderCount: window.currentStudyData.responderCount,
+                totalMeasurements: window.currentStudyData.totalMeasurements,
+                age65: window.currentStudyData.age65,
+                onVentilator: window.currentStudyData.onVentilator,
+                fullConclusion: window.currentConclusion
+            };
+            
+            studyData[mkNumber].push(studyRecord);
+            localStorage.setItem('studyData', JSON.stringify(studyData));
+            
+            alert('Исследование сохранено успешно');
+            
+            // Обновление списка исследований
+            searchPatient();
+        }
+        
+        function deleteStudy(index, mkNumber) {
+            if (confirm('Удалить это исследование?')) {
+                studyData[mkNumber].splice(index, 1);
+                if (studyData[mkNumber].length === 0) {
+                    delete studyData[mkNumber];
+                }
+                localStorage.setItem('studyData', JSON.stringify(studyData));
+                searchPatient();
+            }
+        }
+        
+        // Инициализация
+        setupAutoCalculation();
+    </script>
+</body>
+</html>
